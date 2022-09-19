@@ -116,8 +116,11 @@ Android Studioを起動する。
 ### Android SDK 追加
 
 * Android Tiramisu (Tiramisu)
+  
   ![fig1](attach/20220918092803.png)  
+
 * NDK, Cmake
+  
   ![fig1](attach/20220918094521.png)  
 
 ### Visual Studio 追加
@@ -188,12 +191,17 @@ $ flutter doctor -v
 
 * Android Studio起動
 * New Flutter Projet 選択
+  
   ![fig1](attach/20220919113452.png)  
+
   key|val
   ---|---
   Flutter SDK path|C:¥Users¥xxxx¥scoop¥flutter¥current
+
 * Flutter
+  
   ![fig1](attach/20220919114144.png)  
+
   key|val
   ---|---
   Project name|firstapp
