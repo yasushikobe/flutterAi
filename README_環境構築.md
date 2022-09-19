@@ -183,3 +183,42 @@ $ flutter doctor -v
 ```
 
 このように、``No issues found!``が表示されれば問題なし。  
+
+## サンプルアプリ作成
+
+* Android Studio起動
+* New Flutter Projet 選択
+  ![fig1](attach/20220919113452.png)  
+  key|val
+  ---|---
+  Flutter SDK path|C:¥Users¥xxxx¥scoop¥flutter¥current
+* Flutter
+  ![fig1](attach/20220919114144.png)  
+  key|val
+  ---|---
+  Project name|firstapp
+  Platform|Android
+
+サンプルソースが作成されます。  
+![fig1](attach/20220919115013.png)  
+
+## Androidスマホの接続・デバッグ
+
+* 設定 - デバイス情報 を表示する。  
+* ビルド番号 を７回連続でタップする。  
+* 設定 - システム - 開発者向けオプション を表示する。  
+  key|val
+  ---|---
+  開発者向けオプションの使用|オン
+  USBデバッグ|オン
+
+上記設定ののち、USB-CケーブルをPCに接続する。
+
+![fig1](attach/20220919122106.png)  
+
+ケーブル接続後、ツールバーに接続したAndroid機種名がエントリーされる。  
+その状態で、デバッグボタンを押す。（バグアイコン）  
+
+![fig1](attach/20220919124120.png)  
+
+アプリが自動的に起動されます。  
