@@ -78,3 +78,20 @@ Input passed within the POST body. Supported input methods: raw image binary or 
 * Image file size must be less than 50 MB (4 MB for the free tier).
 * The image/document page dimensions must be at least 50 x 50 pixels and at most 10000 x 10000 pixels.
 
+### Response 202
+
+The service has accepted the request and will start processing soon. The client can query the operation status and result by using the Operation Id from the 'Operation-Location' response header value, a URL. In the following example, the Operation Id is 49a36324-fc4b-4387-aa06-090cfbf0064f, to be used as the ‘operationId’ parameter to the Get Read Results operation, The URL expires in 24 hours.
+
+Response Header Key|Value
+---|---
+Operation-Location|Operation status and result URL.<br/>Example: https://cognitiveservice/vision/v3.2/read/analyzeResults/49a36324-fc4b-4387-aa06-090cfbf0064f
+
+<u>Sample Response Header</u>
+
+```text
+Content-Length: 0 
+Operation-Location: https://japaneast.api.cognitive.microsoft.com/vision/v3.2/read/analyzeResults/08f557b9-c915-4c0d-a1ba-4648a4405195 
+CSP-Billing-Usage: CognitiveServices.ComputerVision.Transaction=1 
+apim-request-id: 08f557b9-c915-4c0d-a1ba-4648a4405195 
+Date: Fri, 04 Sep 2020 10:11:18 GMT
+```
