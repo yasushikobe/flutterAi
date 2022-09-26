@@ -91,6 +91,10 @@ oh-my-posh init pwsh `
   | Invoke-Expression
 ```
 
+このようなPowerShellが起動できるようになりました。　　
+
+![fig1](attach/20220926091133.png)  
+
 ## Android Studio
 
 ```powershell
