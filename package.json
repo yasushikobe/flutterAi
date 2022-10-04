@@ -1,0 +1,16 @@
+{
+  "name": "azurecv",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.mjs",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.27.2",
+    "config": "^3.3.8",
+    "js-yaml": "^4.1.0"
+  }
+}
