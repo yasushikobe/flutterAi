@@ -16,7 +16,7 @@ import { readFile } from "fs/promises";
 import { setTimeout } from "timers/promises";
 import axios from "axios";
 import config from "config";
-const analyzeUrl = `${config.endpoint}vision/v3.2/read/analyze`;
+const analyzeUrl = `${config.endpoint}vision/v3.2/read/analyze?language=ja`;
 const apiKey = config.apiKey;
 const pngFile = config.pngFile;
 
