@@ -95,3 +95,90 @@ CSP-Billing-Usage: CognitiveServices.ComputerVision.Transaction=1
 apim-request-id: 08f557b9-c915-4c0d-a1ba-4648a4405195 
 Date: Fri, 04 Sep 2020 10:11:18 GMT
 ```
+
+## CURLで実習
+
+### CURLコマンド導入
+
+Windowsターミナルを管理者モードで起動し、コマンドプロンプトを起動します。
+
+```cmd
+choco install curl
+```
+
+### CURL動作確認
+
+下記内容が表示されれば、正常に動作しています。  
+
+```text
+$ curl https://google.com
+<HTML><HEAD><meta http-equiv="content-type" content="text/html;charset=utf-8">
+<TITLE>301 Moved</TITLE></HEAD><BODY>
+<H1>301 Moved</H1>
+The document has moved
+<A HREF="https://www.google.com/">here</A>.
+</BODY></HTML>
+```
+
+### OCR解析コマンド発行
+
+#### エンドポイントを記録
+
+![fig1](attach/20221004120308.png)  
+
+上記``エンドポイント``情報を控えます。  
+
+#### APIキーを記録
+
+![fig2](attach/20221004120340.png)  
+
+上記``キー１``情報を控えます。  
+
+
+#### 解析コマンド発行
+
+コマンドプロンプトより実行します。  
+エンドポイントをURLに指定します。
+`Ocp-Apim-Subscription-Key` には、APIキーを設定します。  
+
+```cmd
+curl -i https://xxxxxxxx.xxxx.xxxx.xxx/vision/v3.2/read/analyze\?language\=ja ^
+-H "Content-Type: image/png" ^
+-H "Ocp-Apim-Subscription-Key: xxxxxxxx" ^
+--data-binary "@ocr.png"
+```
+
+#### 解析コマンド実行結果
+
+```text
+HTTP/1.1 202 Accepted
+Content-Length: 0
+Operation-Location: https://doc2chart.cognitiveservices.azure.com/vision/v3.2/read/analyzeResults/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxx
+x-envoy-upstream-service-time: 133
+CSP-Billing-Usage: CognitiveServices.ComputerVision.Transaction=1
+apim-request-id: 7fe71f4a-bae8-4077-a0a4-279282329a34
+Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+x-content-type-options: nosniff
+Date: Tue, 04 Oct 2022 03:32:57 GMT
+```
+
+#### 解析結果取り出し
+
+解析コマンド実行時の`Operation-Location`ヘッダーの値を利用して、結果取り出しを行う。  
+`Ocp-Apim-Subscription-Key` には、APIキーを設定します。  
+
+```cmd
+curl https://doc2chart.cognitiveservices.azure.com/vision/v3.2/read/analyzeResults/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxx ^
+-H "Ocp-Apim-Subscription-Key: xxxxxxxxxx" > result.json
+```
+
+#### 解析結果参照
+
+```cmd
+code result.json
+```
+
+`shift` + `ALT` + `F` で Formatting
+
+![fig1](attach/20221004133529.png)  
+
