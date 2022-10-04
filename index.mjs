@@ -7,22 +7,24 @@
 
 ```default.yaml
 endpoint: "https://.../"
-apikey: "xxxxxxxxxxxxxxxxxxx"
+apiKey: "xxxxxxxxxxxxxxxxxxx"
 pngFile: "xxxxxxxx.png"
 ```
 */
 
 import { readFile } from "fs/promises";
-import axios from "axios";
 import { setTimeout } from "timers/promises";
+import axios from "axios";
 import config from "config";
-async function main() {
-  const analyzeUrl = `${config.endpoint}vision/v3.2/read/analyze`;
-  const binData = await readFile(config.pngFile);
-  const resultLocation = await axios.post(analyzeUrl, binData, {
+const analyzeUrl = `${config.endpoint}vision/v3.2/read/analyze`;
+const apiKey = config.apiKey;
+const pngFile = config.pngFile;
+
+async function analyze(pngData) {
+  const resultLocation = await axios.post(analyzeUrl, pngData, {
     headers: {
       "Content-Type": "image/png",
-      "Ocp-Apim-Subscription-Key": config.apikey,
+      "Ocp-Apim-Subscription-Key": apiKey,
     },
   });
   const location = resultLocation.headers["operation-location"];
@@ -30,7 +32,7 @@ async function main() {
   while (true) {
     await setTimeout(200);
     const resultValue = await axios.get(location, {
-      headers: { "Ocp-Apim-Subscription-Key": config.apikey },
+      headers: { "Ocp-Apim-Subscription-Key": apiKey },
     });
     if (resultValue.data.status !== "succeeded") continue;
     resultLines = resultValue.data.analyzeResult.readResults[0].lines.map(
@@ -38,6 +40,9 @@ async function main() {
     );
     break;
   }
-  console.log(resultLines);
+  return resultLines;
 }
-main();
+
+const pngData = await readFile(pngFile);
+let result = await analyze(pngData);
+console.log(result);
