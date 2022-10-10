@@ -193,3 +193,242 @@ class _MyHomePageState extends State<MyHomePage> {
 
 ## STEP3: OCR解析呼び出し
 
+### package 追加
+
+`pubspec.yaml`を下記のように修正    
+`yaml`, `http` コンポーネントを追加している。 
+
+```yaml
+name: flutter_ai
+description: A new Flutter project.
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+version: 1.0.0+1
+environment:
+  sdk: '>=2.18.2 <3.0.0'
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.5
+  image_picker: ^0.8.6
+  yaml: ^3.1.1
+  http: ^0.13.5
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.1
+flutter:
+  uses-material-design: true
+```
+
+### OCR読み込み関数の追加
+
+```dart
+/// 実行には、/config/default.yaml ファイルを作成する必要があります。
+/// Azure Console Computer Vision の概要ページよりエンドポイント・キー情報を参照し、
+/// default.yamlファイルに設定してください。
+/// 初回起動時には、事前に dart pub get 実行が必要です。
+/// 実行コマンドは、 dart index.dart です。
+///
+/// ```default.yaml
+/// endpoint: "https://.../"
+/// apiKey: "xxxxxxxxxxxxxxxxxxx"
+/// ```
+
+import 'dart:convert';
+import 'dart:io';
+import 'dart:typed_data';
+import 'package:yaml/yaml.dart';
+import 'package:http/http.dart' as http;
+
+final yamlFile = File('../config/default.yaml');
+final config = loadYaml(yamlFile.readAsStringSync());
+final analyzeUrl = "${config['endpoint']}vision/v3.2/read/analyze?language=ja";
+final apiKey = config['apiKey'];
+
+Future<List<String>> analyze(Uint8List pngData) async {
+  final resultLocation = await http.post(Uri.parse(analyzeUrl),
+      headers: {
+        "Content-Type": "image/png",
+        "Ocp-Apim-Subscription-Key": apiKey,
+      },
+      body: pngData);
+  final location = resultLocation.headers["operation-location"];
+  List<dynamic> resultLines;
+  while (true) {
+    await Future.delayed(const Duration(milliseconds: 200));
+    final resultValueString = await http.get(
+      Uri.parse(location!),
+      headers: {"Ocp-Apim-Subscription-Key": apiKey},
+    );
+    final resultValue = jsonDecode(resultValueString.body);
+    if (resultValue['status'] != "succeeded") continue;
+    resultLines = resultValue['analyzeResult']['readResults'][0]['lines']
+        .map((line) => line['text'].toString())
+        .toList();
+    break;
+  }
+  return resultLines.cast<String>();
+}
+```
+
+### Azure設定ファイルの追加
+
+/config/default.yamlを追加  
+
+```yaml
+endpoint: "https://.../"
+apiKey: "xxxxxxxxxxxxxxxxxxx"
+```
+
+## STEP4: 仕上げ
+
+完全なソースコードは
+https://github.com/yasushikobe/flutter_ai
+
+
+```dart
+import 'dart:io';
+import 'package:flutter/material.dart';
+import 'package:flutter_ai/ocr.dart';
+import 'package:image_picker/image_picker.dart';
+
+enum Mode {
+  empty,
+  picture,
+  ocr,
+}
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  // This widget is the root of your application.
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'FlutterAI',
+      theme: ThemeData(
+        primarySwatch: Colors.amber,
+      ),
+      home: const MyHomePage(title: 'FlutterAI'),
+    );
+  }
+}
+
+class MyHomePage extends StatefulWidget {
+  const MyHomePage({super.key, required this.title});
+
+  final String title;
+
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  final picker = ImagePicker();
+
+  Mode mode = Mode.empty;
+  File? _image;
+  List<String> _lines = [];
+
+  Future pickImage() async {
+    final XFile? pickedFile =
+        await picker.pickImage(source: ImageSource.camera);
+    if (pickedFile != null) {
+      _image = File(pickedFile.path);
+      mode = Mode.picture;
+    } else {
+      mode = Mode.empty;
+    }
+    setState(() {});
+  }
+
+  Future ocr() async {
+    showWaitDialog();
+    try {
+      final imageData = _image!.readAsBytesSync();
+      _lines = await analyze(imageData);
+      mode = Mode.ocr;
+      setState(() {});
+    } finally {
+      hideWaitDialog();
+    }
+  }
+
+  Future clear() async {
+    _image = null;
+    mode = Mode.empty;
+    setState(() {});
+  }
+
+  void showWaitDialog() {
+    showGeneralDialog(
+        context: context,
+        barrierDismissible: false,
+        transitionDuration: const Duration(milliseconds: 250),
+        barrierColor: Colors.black.withOpacity(0.5),
+        pageBuilder: (BuildContext context, Animation animation,
+            Animation secondaryAnimation) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        });
+  }
+
+  void hideWaitDialog() {
+    Navigator.pop(context);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: AppBar(
+          title: const Text('FlutterAI'),
+        ),
+        body: Center(
+          child: mode == Mode.empty
+              ? const Text('No image selected.')
+              : mode == Mode.picture
+                  ? Image.file(_image!)
+                  : Container(
+                      alignment: Alignment.topLeft, //任意のプロパティ
+                      margin: const EdgeInsets.all(10),
+                      width: double.infinity,
+                      child: Text(_lines.join('\n'))),
+        ),
+        floatingActionButton: Column(
+          verticalDirection: VerticalDirection.up,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            FloatingActionButton(
+              onPressed: pickImage,
+              child: const Icon(Icons.add_a_photo),
+            ),
+            Visibility(
+              visible: mode == Mode.picture,
+              child: Container(
+                margin: const EdgeInsets.only(bottom: 8.0),
+                child: FloatingActionButton(
+                  onPressed: ocr,
+                  child: const Icon(Icons.text_fields),
+                ),
+              ),
+            ),
+            Visibility(
+              visible: mode == Mode.ocr || mode == Mode.picture,
+              child: Container(
+                margin: const EdgeInsets.only(bottom: 8.0),
+                child: FloatingActionButton(
+                  onPressed: clear,
+                  child: const Icon(Icons.clear),
+                ),
+              ),
+            ),
+          ],
+        ));
+  }
+}
+```
