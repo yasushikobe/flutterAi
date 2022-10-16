@@ -76,7 +76,7 @@ iOS設定にカメラを許可設定を追加します。 (Macでの開発のみ
 
 /ios/Runner/info.plist
 
-```plist
+```xml
     <key>NSPhotoLibraryUsageDescription</key>
     <string>This app requires to access your photo library</string>
     <key>NSCameraUsageDescription</key>
