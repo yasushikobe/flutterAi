@@ -122,6 +122,8 @@ Android Studioを起動する。
 
 ### Android SDK 追加
 
+新規 Flutter projectを開きその状態から導入を行なってください。  
+
 * Android Tiramisu (Tiramisu)
   
   ![fig1](attach/20220918092803.png)  
@@ -193,6 +195,7 @@ $ flutter doctor -v
 ```
 
 このように、``No issues found!``が表示されれば問題なし。  
+Warning/Error が発生した場合、画面表示に従ってください。  
 
 ## サンプルアプリ作成
 
