@@ -60,9 +60,30 @@ android設定にカメラを許可設定を追加します。
 
 ![fig1](attach/20221005113832.png)  
 
+/android/app/src/main/AndroidManifest.xml
+
+```xml
+   <application
+        android:label="flutter_ai"
+        android:name="${applicationName}"
+        android:icon="@mipmap/ic_launcher"
+        android:requestLegacyExternalStorage="true">
+```
+
 iOS設定にカメラを許可設定を追加します。 (Macでの開発のみ)
 
 ![fig1](attach/20221005113735.png)  
+
+/ios/Runner/info.plist
+
+```plist
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>This app requires to access your photo library</string>
+    <key>NSCameraUsageDescription</key>
+    <string>This app requires to add file to your camera</string>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>This app requires to add file to your photo library your microphone</string>
+```
 
 アプリケーションコードを作成します。
 
