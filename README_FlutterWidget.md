@@ -46,38 +46,27 @@ https://github.com/yasushikobe/flutter_ai/tree/v0.2
 
 カメラプラグインを導入します。  
 
+Terminalより、
+
+```cmd
+flutter pub add image_picker
+```
+
+上記コマンドにより、`pubspec.yaml`が下記のように更新されます。  
+
 ![fig1](attach/20221005113505.png)  
 
 android設定にカメラを許可設定を追加します。
 
 ![fig1](attach/20221005113832.png)  
 
-iOS設定にカメラを許可設定を追加します。
+iOS設定にカメラを許可設定を追加します。 (Macでの開発のみ)
 
 ![fig1](attach/20221005113735.png)  
 
-アプリケーションコードを作成します。（下記、[ソースコード解説](ソースコード解説)を参照)
+アプリケーションコードを作成します。
 
 ![fig1](attach/20221005113940.png)  
-
-デバイスを選択し、デバッグボタンを押下します。  
-
-![fig1](attach/20221005114114.png)  
-
-android emulatorが起動します。  
-
-![fig1](attach/20221005114140.png)  
-
-右下のボタンを押すとカメラが起動されます。
-
-![fig1](attach/20221005114526.png)  
-
-撮影された画像が画面に反映されます。  
-(Emulatorの場合、縦横判定ができない制限があります。)
-
-![fig1](attach/20221005114551.png)  
-
-### ソースコード解説
 
 #### <u>パッケージの取り込み</u>
 
@@ -191,12 +180,35 @@ class _MyHomePageState extends State<MyHomePage> {
 
 ```
 
+デバイスを選択し、デバッグボタンを押下します。  
+
+![fig1](attach/20221005114114.png)  
+
+android emulatorが起動します。  
+
+![fig1](attach/20221005114140.png)  
+
+右下のボタンを押すとカメラが起動されます。
+
+![fig1](attach/20221005114526.png)  
+
+撮影された画像が画面に反映されます。  
+(Emulatorの場合、縦横判定ができない制限があります。)
+
+![fig1](attach/20221005114551.png)  
+
 ## STEP3: OCR解析呼び出し
 
 ### package 追加
 
-`pubspec.yaml`を下記のように修正    
-`yaml`, `http` コンポーネントを追加している。 
+`yaml`, `http` コンポーネントを追加します。
+
+```cmd
+flutter pub add yaml
+flutter pub add http
+```
+
+更新後の `pubspec.yaml`  
 
 ```yaml
 name: flutter_ai
@@ -222,30 +234,32 @@ flutter:
 
 ### OCR読み込み関数の追加
 
+`lib/ocr.dart` ファイルを作成します。
+
 ```dart
-/// 実行には、/config/default.yaml ファイルを作成する必要があります。
-/// Azure Console Computer Vision の概要ページよりエンドポイント・キー情報を参照し、
-/// default.yamlファイルに設定してください。
-/// 初回起動時には、事前に dart pub get 実行が必要です。
-/// 実行コマンドは、 dart index.dart です。
+/// 実行には、/lib/param.dart ファイルを作成する必要があります。
+/// Azure Console Computer Vision の概要ページよりエンドポイント・キー情報を参照。
 ///
-/// ```default.yaml
-/// endpoint: "https://.../"
-/// apiKey: "xxxxxxxxxxxxxxxxxxx"
+/// ```/lib/param.dart
+/// const String endpoint = "https://.../"
+/// const String apiKey = "xxxxxxxxxxxxxxxxxxx"
 /// ```
 
+//json変換
 import 'dart:convert';
-import 'dart:io';
+//バイナリリスト型
 import 'dart:typed_data';
-import 'package:yaml/yaml.dart';
+//Azure endpoint, key
+import 'package:flutter_ai/param.dart';
+//http query
 import 'package:http/http.dart' as http;
 
-final yamlFile = File('../config/default.yaml');
-final config = loadYaml(yamlFile.readAsStringSync());
-final analyzeUrl = "${config['endpoint']}vision/v3.2/read/analyze?language=ja";
-final apiKey = config['apiKey'];
+//Azure computer vision url
+const analyzeUrl = "${endpoint}vision/v3.2/read/analyze?language=ja";
 
+//OCR解析クラス
 Future<List<String>> analyze(Uint8List pngData) async {
+  //Azure computer vision 解析依頼
   final resultLocation = await http.post(Uri.parse(analyzeUrl),
       headers: {
         "Content-Type": "image/png",
@@ -256,6 +270,7 @@ Future<List<String>> analyze(Uint8List pngData) async {
   List<dynamic> resultLines;
   while (true) {
     await Future.delayed(const Duration(milliseconds: 200));
+    //Azure computer vision 結果取り出し
     final resultValueString = await http.get(
       Uri.parse(location!),
       headers: {"Ocp-Apim-Subscription-Key": apiKey},
@@ -267,17 +282,18 @@ Future<List<String>> analyze(Uint8List pngData) async {
         .toList();
     break;
   }
+  //複数行文字列情報を返却
   return resultLines.cast<String>();
 }
 ```
 
 ### Azure設定ファイルの追加
 
-/config/default.yamlを追加  
+lib/param.dartを追加  
 
 ```yaml
-endpoint: "https://.../"
-apiKey: "xxxxxxxxxxxxxxxxxxx"
+const String endpoint = "https://computer visionのendpoint url/";
+const String apiKey = "computer visionのkey";
 ```
 
 ## STEP4: 仕上げ
@@ -286,26 +302,39 @@ apiKey: "xxxxxxxxxxxxxxxxxxx"
 https://github.com/yasushikobe/flutter_ai
 
 
+### main.dart
+
 ```dart
+//ファイル処理
 import 'dart:io';
+
+//画面処理
 import 'package:flutter/material.dart';
+
+//OCR処理
 import 'package:flutter_ai/ocr.dart';
+
+//カメラ処理
 import 'package:image_picker/image_picker.dart';
 
+//画面動作状態
 enum Mode {
-  empty,
-  picture,
-  ocr,
+  empty, //データなし
+  picture, //写真データあり
+  ocr, //ocrデータあり
 }
 
+//メイン処理
 void main() {
+  //アプリケーションクラスを稼働させる。
   runApp(const MyApp());
 }
 
+//アプリケーションクラス（状態なし）
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
+  //MaterialApp形式で動作させる。
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -318,6 +347,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
+//ページクラス（状態オブジェクトを保持する）
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
 
@@ -327,57 +357,84 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
+//ページ状態クラス
 class _MyHomePageState extends State<MyHomePage> {
+  //カメラオブジェクト
   final picker = ImagePicker();
 
+  //初期状態は、データなし状態に設定する。
   Mode mode = Mode.empty;
+
+  //カメラ撮影した画像ファイル
   File? _image;
+
+  //複数行にデコードされたOCRテキスト
   List<String> _lines = [];
 
+  //写真を撮影する。
   Future pickImage() async {
+    //カメラデバイスより画像情報を取得する。
     final XFile? pickedFile =
         await picker.pickImage(source: ImageSource.camera);
+    //画像情報が存在した場合、ファイルオブジェクトに変換する。
     if (pickedFile != null) {
       _image = File(pickedFile.path);
       mode = Mode.picture;
     } else {
       mode = Mode.empty;
     }
+    //画面更新を行う。
     setState(() {});
   }
 
+  //OCR解析を行う。
   Future ocr() async {
+    //画面操作ロック
     showWaitDialog();
     try {
+      //バイナリデータに変換する。
       final imageData = _image!.readAsBytesSync();
+      //Azure computer visionを呼び出す。
       _lines = await analyze(imageData);
+      //画面モードをocrデータありにする。
       mode = Mode.ocr;
+      //画面更新を行う。
       setState(() {});
     } finally {
+      //画面操作アンロック
       hideWaitDialog();
     }
   }
 
+  //画面初期化
   Future clear() async {
+    //画像ファイル初期化
     _image = null;
+    //ocrデータ初期化
+    _lines = [];
+    //画面モードをデータなしに設定
     mode = Mode.empty;
+    //画面更新を行う。
     setState(() {});
   }
 
+  //画面操作ロック
   void showWaitDialog() {
     showGeneralDialog(
-        context: context,
-        barrierDismissible: false,
-        transitionDuration: const Duration(milliseconds: 250),
-        barrierColor: Colors.black.withOpacity(0.5),
-        pageBuilder: (BuildContext context, Animation animation,
-            Animation secondaryAnimation) {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        });
+      context: context,
+      barrierDismissible: false,
+      transitionDuration: const Duration(milliseconds: 250),
+      barrierColor: Colors.black.withOpacity(0.5),
+      pageBuilder: (BuildContext context, Animation animation,
+          Animation secondaryAnimation) {
+        return const Center(
+          child: CircularProgressIndicator(),
+        );
+      },
+    );
   }
 
+  //画面操作アンロック
   void hideWaitDialog() {
     Navigator.pop(context);
   }
@@ -385,50 +442,54 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: const Text('FlutterAI'),
-        ),
-        body: Center(
-          child: mode == Mode.empty
-              ? const Text('No image selected.')
-              : mode == Mode.picture
-                  ? Image.file(_image!)
-                  : Container(
-                      alignment: Alignment.topLeft, //任意のプロパティ
-                      margin: const EdgeInsets.all(10),
-                      width: double.infinity,
-                      child: Text(_lines.join('\n'))),
-        ),
-        floatingActionButton: Column(
-          verticalDirection: VerticalDirection.up,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            FloatingActionButton(
-              onPressed: pickImage,
-              child: const Icon(Icons.add_a_photo),
-            ),
-            Visibility(
-              visible: mode == Mode.picture,
-              child: Container(
-                margin: const EdgeInsets.only(bottom: 8.0),
-                child: FloatingActionButton(
-                  onPressed: ocr,
-                  child: const Icon(Icons.text_fields),
-                ),
+      //画面タイトル
+      appBar: AppBar(
+        title: const Text('FlutterAI'),
+      ),
+      body: Center(
+        //画面本体（画面モードにより描画する情報を切り替える）
+        child: mode == Mode.empty
+            ? const Text('No image selected.')
+            : mode == Mode.picture
+                ? Image.file(_image!)
+                : Container(
+                    alignment: Alignment.topLeft, //任意のプロパティ
+                    margin: const EdgeInsets.all(10),
+                    width: double.infinity,
+                    child: Text(_lines.join('\n'))),
+      ),
+      //初期化・カメラ撮影・OCR変換ボタン
+      floatingActionButton: Column(
+        verticalDirection: VerticalDirection.up,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          FloatingActionButton(
+            onPressed: pickImage,
+            child: const Icon(Icons.add_a_photo),
+          ),
+          Visibility(
+            visible: mode == Mode.picture,
+            child: Container(
+              margin: const EdgeInsets.only(bottom: 8.0),
+              child: FloatingActionButton(
+                onPressed: ocr,
+                child: const Icon(Icons.text_fields),
               ),
             ),
-            Visibility(
-              visible: mode == Mode.ocr || mode == Mode.picture,
-              child: Container(
-                margin: const EdgeInsets.only(bottom: 8.0),
-                child: FloatingActionButton(
-                  onPressed: clear,
-                  child: const Icon(Icons.clear),
-                ),
+          ),
+          Visibility(
+            visible: mode == Mode.ocr || mode == Mode.picture,
+            child: Container(
+              margin: const EdgeInsets.only(bottom: 8.0),
+              child: FloatingActionButton(
+                onPressed: clear,
+                child: const Icon(Icons.clear),
               ),
             ),
-          ],
-        ));
+          ),
+        ],
+      ),
+    );
   }
 }
 ```
