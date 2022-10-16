@@ -12,10 +12,10 @@ Androidスマホ|Android8.0以上
 ## ベース環境セットアップ
 
 [Microsoftアプリストア（アプリインストーラー）](https://apps.microsoft.com/store/detail/%E3%82%A2%E3%83%97%E3%83%AA-%E3%82%A4%E3%83%B3%E3%82%B9%E3%83%88%E3%83%BC%E3%83%A9%E3%83%BC/9NBLGGH4NNS1?hl=ja-jp&gl=jp)より、アプリインストーラーの導入（更新）を行います。  
-Windows 10 の方は、コマンドプロンプトを管理者モードで起動。
 
 `Windowsターミナル`を管理者モードで起動する。  
 PowerShellがコンソールに表示されていることを確認します。  
+Windows 10 の方は、コマンドプロンプトを管理者モードで起動。
 
 ```powershell
 winget source update
@@ -24,6 +24,8 @@ winget install Microsoft.WindowsTerminal
 winget install Google.Chrome --scope machine
 winget install -q vscode --scope machine
 ```
+
+Windows 10の方は、コマンドプロンプトを終了し、Windowsターミナルを管理者モードで起動します。  
 
 ```powershell
 Set-ExecutionPolicy Bypass `
