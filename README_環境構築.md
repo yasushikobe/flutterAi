@@ -203,7 +203,7 @@ $ flutter doctor -v
 
   key|val
   ---|---
-  Flutter SDK path|C:¥Users¥xxxx¥scoop¥flutter¥current
+  Flutter SDK path|C:¥Users¥xxxx¥scoop¥apps¥flutter¥current
 
 * Flutter
   
