@@ -384,7 +384,7 @@ class _MyHomePageState extends State<MyHomePage> {
   final picker = ImagePicker();
 
   //初期状態は、データなし状態に設定する。
-  Mode mode = Mode.empty;
+  Mode _mode = Mode.empty;
 
   //カメラ撮影した画像ファイル
   File? _image;
@@ -400,9 +400,9 @@ class _MyHomePageState extends State<MyHomePage> {
     //画像情報が存在した場合、ファイルオブジェクトに変換する。
     if (pickedFile != null) {
       _image = File(pickedFile.path);
-      mode = Mode.picture;
+      _mode = Mode.picture;
     } else {
-      mode = Mode.empty;
+      _mode = Mode.empty;
     }
     //画面更新を行う。
     setState(() {});
@@ -418,7 +418,7 @@ class _MyHomePageState extends State<MyHomePage> {
       //Azure computer visionを呼び出す。
       _lines = await analyze(imageData);
       //画面モードをocrデータありにする。
-      mode = Mode.ocr;
+      _mode = Mode.ocr;
       //画面更新を行う。
       setState(() {});
     } finally {
@@ -434,7 +434,7 @@ class _MyHomePageState extends State<MyHomePage> {
     //ocrデータ初期化
     _lines = [];
     //画面モードをデータなしに設定
-    mode = Mode.empty;
+    _mode = Mode.empty;
     //画面更新を行う。
     setState(() {});
   }
@@ -460,6 +460,23 @@ class _MyHomePageState extends State<MyHomePage> {
     Navigator.pop(context);
   }
 
+  //画面本体（画面モードにより描画する情報を切り替える）
+  Widget drawBody(Mode mode) {
+    switch (_mode) {
+      case Mode.empty:
+        return const Text('No image selected.');
+      case Mode.picture:
+        return Image.file(_image!);
+      case Mode.ocr:
+        return Container(
+          alignment: Alignment.topLeft,
+          margin: const EdgeInsets.all(10),
+          width: double.infinity,
+          child: Text(_lines.join('\n')),
+        );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -467,17 +484,9 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: const Text('FlutterAI'),
       ),
+      //画面本体
       body: Center(
-        //画面本体（画面モードにより描画する情報を切り替える）
-        child: mode == Mode.empty
-            ? const Text('No image selected.')
-            : mode == Mode.picture
-                ? Image.file(_image!)
-                : Container(
-                    alignment: Alignment.topLeft, //任意のプロパティ
-                    margin: const EdgeInsets.all(10),
-                    width: double.infinity,
-                    child: Text(_lines.join('\n'))),
+        child: drawBody(_mode),
       ),
       //初期化・カメラ撮影・OCR変換ボタン
       floatingActionButton: Column(
@@ -489,7 +498,7 @@ class _MyHomePageState extends State<MyHomePage> {
             child: const Icon(Icons.add_a_photo),
           ),
           Visibility(
-            visible: mode == Mode.picture,
+            visible: _mode == Mode.picture,
             child: Container(
               margin: const EdgeInsets.only(bottom: 8.0),
               child: FloatingActionButton(
@@ -499,7 +508,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
           Visibility(
-            visible: mode == Mode.ocr || mode == Mode.picture,
+            visible: _mode == Mode.ocr || _mode == Mode.picture,
             child: Container(
               margin: const EdgeInsets.only(bottom: 8.0),
               child: FloatingActionButton(
