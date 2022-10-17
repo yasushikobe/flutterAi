@@ -462,7 +462,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   //画面本体（画面モードにより描画する情報を切り替える）
   Widget drawBody(Mode mode) {
-    switch (_mode) {
+    switch (mode) {
       case Mode.empty:
         return const Text('No image selected.');
       case Mode.picture:
