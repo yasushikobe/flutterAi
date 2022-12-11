@@ -174,7 +174,7 @@ curl -i https://xxxxxxxx.xxxx.xxxx.xxx/vision/v3.2/read/analyze\?language\=ja ^
 ```text
 HTTP/1.1 202 Accepted
 Content-Length: 0
-Operation-Location: https://doc2chart.cognitiveservices.azure.com/vision/v3.2/read/analyzeResults/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxx
+Operation-Location: https://xxxxxxxx.xxxx.xxxx.xxx/vision/v3.2/read/analyzeResults/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxx
 x-envoy-upstream-service-time: 133
 CSP-Billing-Usage: CognitiveServices.ComputerVision.Transaction=1
 apim-request-id: 7fe71f4a-bae8-4077-a0a4-279282329a34
@@ -189,7 +189,7 @@ Date: Tue, 04 Oct 2022 03:32:57 GMT
 `Ocp-Apim-Subscription-Key` には、APIキーを設定します。  
 
 ```cmd
-curl https://doc2chart.cognitiveservices.azure.com/vision/v3.2/read/analyzeResults/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxx ^
+curl https://xxxxxxxx.xxxx.xxxx.xxx/vision/v3.2/read/analyzeResults/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxx ^
 -H "Ocp-Apim-Subscription-Key: xxxxxxxxxx" > result.json
 ```
 
