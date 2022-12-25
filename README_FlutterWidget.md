@@ -2,9 +2,6 @@
 
 ## STEP1: 初期雛形作成
 
-ソースコードはこちら  
-https://github.com/yasushikobe/flutter_ai/tree/v0.1
-
 Android Studioを起動します。  
 
 ![fig1](attach/20221005110045.png)  
@@ -19,7 +16,7 @@ Android Studioを起動します。
 
 key|val
 ---|---
-Project name|flutter_ai
+Project name|sample_app
 Project location|任意のフォルダを設定します。
 Project type|Application
 Organization|あなたが所属している、唯一のドメインを指定します。<br/>（独自ドメインが一般的）
@@ -39,9 +36,6 @@ Android Emulatorを起動し、デバッグボタンを押下する。
 
 ## STEP2: カメラ撮影機能追加
 
-ソースコードはこちら  
-https://github.com/yasushikobe/flutter_ai/tree/v0.2
-
 ### 開発概説
 
 カメラプラグインを導入します。  
@@ -55,20 +49,6 @@ flutter pub add image_picker
 上記コマンドにより、`pubspec.yaml`が下記のように更新されます。  
 
 ![fig1](attach/20221005113505.png)  
-
-android設定にカメラを許可設定を追加します。
-
-![fig1](attach/20221005113832.png)  
-
-/android/app/src/main/AndroidManifest.xml
-
-```xml
-   <application
-        android:label="flutter_ai"
-        android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher"
-        android:requestLegacyExternalStorage="true">
-```
 
 iOS設定にカメラを許可設定を追加します。 (Macでの開発のみ)
 
@@ -231,7 +211,7 @@ flutter pub add http
 更新後の `pubspec.yaml`  
 
 ```yaml
-name: flutter_ai
+name: sample_app
 description: A new Flutter project.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
@@ -318,7 +298,7 @@ Future<List<String>> analyze(Uint8List jpegData) async {
 ## STEP4: 仕上げ
 
 完全なソースコードは
-https://github.com/yasushikobe/flutter_ai
+https://github.com/yasushikobe/sample_app
 
 
 ### main.dart
