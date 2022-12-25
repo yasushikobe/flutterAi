@@ -331,7 +331,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 
 //OCR処理
-import 'package:flutter_ai/ocr.dart';
+import 'package:sample_app/ocr.dart';
 
 //カメラ処理
 import 'package:image_picker/image_picker.dart';
@@ -394,7 +394,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Future pickImage() async {
     //カメラデバイスより画像情報を取得する。
     final XFile? pickedFile =
-        await picker.pickImage(source: ImageSource.camera);
+    await picker.pickImage(source: ImageSource.camera);
     //画像情報が存在した場合、ファイルオブジェクトに変換する。
     if (pickedFile != null) {
       _image = File(pickedFile.path);
