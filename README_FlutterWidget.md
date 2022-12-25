@@ -225,7 +225,6 @@ android emulatorが起動します。
 `yaml`, `http` コンポーネントを追加します。
 
 ```cmd
-flutter pub add yaml
 flutter pub add http
 ```
 
@@ -243,7 +242,6 @@ dependencies:
     sdk: flutter
   cupertino_icons: ^1.0.5
   image_picker: ^0.8.6
-  yaml: ^3.1.1
   http: ^0.13.5
 dev_dependencies:
   flutter_test:
@@ -251,6 +249,15 @@ dev_dependencies:
   flutter_lints: ^2.0.1
 flutter:
   uses-material-design: true
+```
+
+### Azure設定ファイルの追加
+
+lib/param.dartを追加  
+
+```yaml
+const String endpoint = "https://computer visionのendpoint url/";
+const String apiKey = "computer visionのkey";
 ```
 
 ### OCR読み込み関数の追加
@@ -271,7 +278,7 @@ import 'dart:convert';
 //バイナリリスト型
 import 'dart:typed_data';
 //Azure endpoint, key
-import 'package:flutter_ai/param.dart';
+import 'package:sample_app/param.dart';
 //http query
 import 'package:http/http.dart' as http;
 
@@ -279,14 +286,14 @@ import 'package:http/http.dart' as http;
 const analyzeUrl = "${endpoint}vision/v3.2/read/analyze?language=ja";
 
 //OCR解析クラス
-Future<List<String>> analyze(Uint8List pngData) async {
+Future<List<String>> analyze(Uint8List jpegData) async {
   //Azure computer vision 解析依頼
   final resultLocation = await http.post(Uri.parse(analyzeUrl),
       headers: {
-        "Content-Type": "image/png",
+        "Content-Type": "image/jpeg",
         "Ocp-Apim-Subscription-Key": apiKey,
       },
-      body: pngData);
+      body: jpegData);
   final location = resultLocation.headers["operation-location"];
   List<dynamic> resultLines;
   while (true) {
@@ -306,15 +313,6 @@ Future<List<String>> analyze(Uint8List pngData) async {
   //複数行文字列情報を返却
   return resultLines.cast<String>();
 }
-```
-
-### Azure設定ファイルの追加
-
-lib/param.dartを追加  
-
-```yaml
-const String endpoint = "https://computer visionのendpoint url/";
-const String apiKey = "computer visionのkey";
 ```
 
 ## STEP4: 仕上げ
